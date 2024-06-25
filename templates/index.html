@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repo | Testing</title>
+</head>
+
+<body>
+    {% if pull %}
+    {% for pr in pull %}
+    <div>
+        <p><strong>Repo Name:</strong> <a href="{{ pr.base_html_url }}/{{pr.repo}}">{{ pr.repo }}</a></p>
+        <p><strong>PR ID:</strong> {{ pr.id }}</p>
+        <p><strong>Title:</strong> {{ pr.title }}</p>
+        <p><strong>Requester Name:</strong> {{ pr.requester_name }}</p>
+        <p><strong>Requested Time:</strong> {{ pr.created_at }}</p>
+        <p><strong>PR Status:</strong> {{ pr.pr_status }}</p>
+        <!-- <p><strong>Total Pull Requests:</strong> {{ pr.total_pull_requests }}</p> -->
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No pull requests yet.</p>
+    {% endif %}
+</body>
+
+</html>
