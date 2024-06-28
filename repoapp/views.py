@@ -48,9 +48,7 @@ def github_webhook(request):
                     # You can also set the created_at field manually if needed
                     created_at=timezone.now(),
                 )
-                # Increment the total_pull_requests count
-                # existing_pull_request.total_pull_requests += 1
-                existing_pull_request.pr_status = 'Waiting to get merged'
+                existing_pull_request.pr_status = 'Pending'
                 existing_pull_request.repo = repo_data.get('name', '')
                 existing_pull_request.save()
                 
