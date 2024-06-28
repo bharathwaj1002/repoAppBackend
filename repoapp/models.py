@@ -14,3 +14,10 @@ class PullRequest(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Repositories(models.Model):
+    repoName = models.CharField(max_length=255,default='')
+    creatorName = models.CharField(max_length=255,default='')
+    url = models.URLField(max_length=200)
+    def __str__(self):
+        return self.repoName

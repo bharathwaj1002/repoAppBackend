@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils import timezone
-from .serializers import PullRequestSerializer
+from .serializers import *
 import json
 
 from.models import PullRequest
@@ -16,6 +16,11 @@ def index(request):
 def pull_requests_list(request):
     pull_requests = PullRequest.objects.all()
     serializer = PullRequestSerializer(pull_requests, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+def repositories_list(request):
+    pull_requests = Repositories.objects.all()
+    serializer = RepositorySerializer(pull_requests, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 @require_POST
