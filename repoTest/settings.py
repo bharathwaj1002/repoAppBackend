@@ -30,7 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_WHITELIST = (
-    "https://code-saipens-soc.netlify.app",
+    "https://mahaveer-project17.netlify.app",
 )
 
 
