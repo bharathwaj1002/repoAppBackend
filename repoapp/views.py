@@ -1,10 +1,14 @@
+import time
+from django.conf import settings
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from .serializers import *
 import json
+import jwt
+import requests
 
 from.models import PullRequest
 
@@ -57,6 +61,10 @@ def github_webhook(request):
                 existing_pull_request.repo = repo_data.get('name', '')
                 existing_pull_request.save()
                 
+                user = Points.objects.filter(userName=requester_name)
+                user.point += 3
+                print(user.point)
+                
                 return JsonResponse({'status': 'created'})
 
             # Handle pull request merge
@@ -75,6 +83,11 @@ def github_webhook(request):
                 existing_pull_request.repo = repo_data.get('name', '')
                 existing_pull_request.save()
                 
+                user = Points.objects.filter(userName=requester_name)
+                user.point += 10
+                print(user.point)
+                
+                
                 return JsonResponse({'status': 'merged'})
 
         except Exception as e:
@@ -82,3 +95,60 @@ def github_webhook(request):
             return JsonResponse({'status': 'error'}, status=400)
     else:
         return JsonResponse({'status': 'invalid-method'}, status=405)
+
+
+
+
+
+
+@csrf_exempt
+@require_POST
+def github_callback(request):
+    try:
+        body = json.loads(request.body)
+        code = body.get('code')
+        
+        if not code:
+            return JsonResponse({'error': 'Code parameter is missing'}, status=400)
+
+        # Exchange code for access token from GitHub
+        response = requests.post('https://github.com/login/oauth/access_token', data={
+            'client_id': settings.GITHUB_CLIENT_ID,
+            'client_secret': settings.GITHUB_CLIENT_SECRET,
+            'code': code,
+        }, headers={'Accept': 'application/json'})
+
+        access_token = response.json().get('access_token')
+
+        if not access_token:
+            return JsonResponse({'error': 'Failed to retrieve access token'}, status=400)
+
+        # Use the access token to fetch user details from GitHub
+        user_response = requests.get('https://api.github.com/user', headers={
+            'Authorization': f'token {access_token}'
+        })
+
+        github_user_data = user_response.json()
+        userName = github_user_data['login']
+        displayName = github_user_data.get('name', '')
+
+        if RegisteredUser.objects.filter(userName=userName).exists():
+            # Generate JWT token
+            payload = {
+                'user_id': userName,
+                'exp': int(time.time()) + 3600  # Token expires in 1 hour
+            }
+            secret_key = settings.JWT_SECRET_KEY  # Ensure you have this setting
+            jwt_token = jwt.encode(payload, secret_key, algorithm='HS256')
+
+            # Return JSON response with the JWT token
+            return JsonResponse({
+                'username': userName,
+                'jwtToken': jwt_token,
+                'message': 'Authentication successful'
+            })
+        else:
+            return JsonResponse({'error': 'You haven\'t registered for SOC'}, status=401)
+    except Exception as e:
+        print(f'Error during GitHub callback: {e}')
+        return JsonResponse({'error': 'An error occurred during authentication'}, status=500)

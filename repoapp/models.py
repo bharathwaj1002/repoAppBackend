@@ -21,3 +21,16 @@ class Repositories(models.Model):
     url = models.URLField(max_length=200)
     def __str__(self):
         return self.repoName
+    
+class RegisteredUser(models.Model):
+    userName = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.userName
+    
+class Points(models.Model):
+    username =models.CharField(max_length=50,primary_key=True)
+    point = models.IntegerField(blank=True, null=True)
+    
+    def __str__(self):
+        return self.username
