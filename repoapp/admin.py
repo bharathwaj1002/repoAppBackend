@@ -4,3 +4,4 @@ from .models import *
 admin.site.register(PullRequest)
 admin.site.register(Repositories)
 admin.site.register(RegisteredUser)
+admin.site.register(Point)
