@@ -27,7 +27,7 @@ def repositories_list(request):
     serializer = RepositorySerializer(repository, many=True)
     return JsonResponse(serializer.data, safe=False)
 
-def point_list(request):
+def points_list(request):
     point = Point.objects.all()
     serializer = PointSerializer(point, many=True)
     return JsonResponse(serializer.data, safe=False)
@@ -54,20 +54,21 @@ def github_webhook(request):
             if pr_action == 'opened':
                 # Check if a PullRequest record exists for the requester
                 existing_pull_request, created = PullRequest.objects.get_or_create(
-                    id=pr_data['id'],  # Storing the GitHub PR ID
+                    prId=pr_data['id'],  # Storing the GitHub PR ID
                     title=pr_title,
                     html_url=pr_html_url,
                     base_html_url=base_html_url,
-                    requester_name=requester_name,
-                    # You can also set the created_at field manually if needed
-                    created_at=timezone.now(),
+                    requesterName=requester_name,
+                    # You can also set the requestedTime field manually if needed
+                    requestedTime=timezone.now(),
                 )
                 existing_pull_request.pr_status = 'Pending'
                 existing_pull_request.repo = repo_data.get('name', '')
                 existing_pull_request.save()
                 
-                user = Point.objects.filter(userName=requester_name)
-                user.point += 3
+                user = Point.objects.get(userName=requester_name)
+                user.point+=3
+                user.save()
                 print(user.point)
                 
                 return JsonResponse({'status': 'created'})
@@ -76,20 +77,23 @@ def github_webhook(request):
             elif pr_action == 'closed' and pr_merged:
                 # Update the PR status and repository information
                 existing_pull_request, created = PullRequest.objects.get_or_create(
-                    id=pr_data['id'],
+                    prId=pr_data['id'],
                     defaults={
                         'title': pr_title,
                         'html_url': pr_html_url,
-                        'requester_name': requester_name,
-                        'created_at': timezone.now(),
+                        'requesterName': requester_name,
+                        'requestedTime': timezone.now(),
                     }
                 )
                 existing_pull_request.pr_status = 'Merged'
                 existing_pull_request.repo = repo_data.get('name', '')
                 existing_pull_request.save()
                 
-                user = Point.objects.filter(userName=requester_name)
-                user.point += 10
+                user = Point.objects.get(userName=requester_name)
+                user.point-=3
+                user.point+=10
+                user.save()
+                
                 print(user.point)
                 
                 
