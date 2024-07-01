@@ -28,7 +28,7 @@ class RegisteredUser(models.Model):
     def __str__(self):
         return self.userName
     
-class Points(models.Model):
+class Point(models.Model):
     username =models.CharField(max_length=50,primary_key=True)
     point = models.IntegerField(blank=True, null=True)
     

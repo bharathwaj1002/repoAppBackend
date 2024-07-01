@@ -23,8 +23,13 @@ def pull_requests_list(request):
     return JsonResponse(serializer.data, safe=False)
 
 def repositories_list(request):
-    pull_requests = Repositories.objects.all()
-    serializer = RepositorySerializer(pull_requests, many=True)
+    repository = Repositories.objects.all()
+    serializer = RepositorySerializer(repository, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+def point_list(request):
+    point = Point.objects.all()
+    serializer = PointSerializer(point, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 @require_POST
@@ -61,7 +66,7 @@ def github_webhook(request):
                 existing_pull_request.repo = repo_data.get('name', '')
                 existing_pull_request.save()
                 
-                user = Points.objects.filter(userName=requester_name)
+                user = Point.objects.filter(userName=requester_name)
                 user.point += 3
                 print(user.point)
                 
@@ -83,7 +88,7 @@ def github_webhook(request):
                 existing_pull_request.repo = repo_data.get('name', '')
                 existing_pull_request.save()
                 
-                user = Points.objects.filter(userName=requester_name)
+                user = Point.objects.filter(userName=requester_name)
                 user.point += 10
                 print(user.point)
                 
