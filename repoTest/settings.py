@@ -29,9 +29,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     "https://mahaveer-project17.netlify.app",
     "http://localhost:3000",
+    "http://127.0.0.1:3000"
 )
 
 
@@ -213,3 +215,5 @@ JAZZMIN_UI_TWEAKS = {
 GITHUB_CLIENT_ID = 'Ov23liUaH6DXYpQeOviF'
 GITHUB_CLIENT_SECRET = '81fff3c9242f62632364d08188dd3fca61605b46'
 JWT_SECRET_KEY = 'ehviydefuy3t3764tytfusduy45434uhyudg362t467324gvcgvj783487t3784t37648724gyuwgduyusyudgusydgufueufg67'
+GOOGLE_CLIENT_ID = '361457186217-3k36h02qtvmobb4dh83nohauksv435ts.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET= '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',

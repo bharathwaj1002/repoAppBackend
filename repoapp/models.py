@@ -23,10 +23,11 @@ class Repositories(models.Model):
         return self.repoName
     
 class RegisteredUser(models.Model):
-    userName = models.CharField(max_length=50)
+    email = models.EmailField(primary_key=True)
+    userName = models.CharField(max_length=50,blank=True, null=True)
     
     def __str__(self):
-        return self.userName
+        return self.email
     
 class Point(models.Model):
     userName =models.CharField(max_length=50,primary_key=True)

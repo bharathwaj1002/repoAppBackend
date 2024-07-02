@@ -20,5 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('',include('repoapp.urls')),
-    path('github/',include('repoapp.urls'))
+    path('github/',include('repoapp.urls')),
+    path('google/',include('repoapp.urls'))
 ]
