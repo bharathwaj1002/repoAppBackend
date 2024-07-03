@@ -22,8 +22,8 @@ def pull_requests_list(request):
     return JsonResponse(serializer.data, safe=False)
 
 def repositories_list(request):
-    repository = Repositories.objects.all()
-    serializer = RepositorySerializer(repository, many=True)
+    repositories = Repositories.objects.all()
+    serializer = RepositorySerializer(repositories, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 def points_list(request):
@@ -253,73 +253,3 @@ def github_callback(request):
     except Exception as e:
         print(f'Error during GitHub callback: {e}')
         return JsonResponse({'error': 'An error occurred during authentication'}, status=500)
-        return JsonResponse({'error': 'An error occurred during authentication'}, status=500)
-
-
-
-
-
-
-
-
-
-
-
-# @csrf_exempt
-# @require_POST
-# def github_callback(request):
-#     try:
-#         body = json.loads(request.body)
-#         code = body.get('code')
-#         email = body.get('email')
-        
-#         if not code:
-#             return JsonResponse({'error': 'Code parameter is missing'}, status=400)
-
-#         # Exchange code for access token from GitHub
-#         response = requests.post('https://github.com/login/oauth/access_token', data={
-#             'client_id': settings.GITHUB_CLIENT_ID,
-#             'client_secret': settings.GITHUB_CLIENT_SECRET,
-#             'code': code,
-#         }, headers={'Accept': 'application/json'})
-
-#         access_token = response.json().get('access_token')
-
-#         if not access_token:
-#             return JsonResponse({'error': 'Failed to retrieve access token'}, status=400)
-
-#         # Use the access token to fetch user details from GitHub
-#         user_response = requests.get('https://api.github.com/user', headers={
-#             'Authorization': f'token {access_token}'
-#         })
-
-#         github_user_data = user_response.json()
-#         print(f"Data: {github_user_data}")
-#         # print(github_user_data)
-#         userName = github_user_data['login']
-#         displayName = github_user_data.get('name', '')
-#         email = github_user_data.get('email', '')
-#         print(f"userName: {userName}")
-#         print(f"Email: {email}")
-
-#         if RegisteredUser.objects.filter(userName=userName).exists():
-#             # Generate JWT token
-#             payload = {
-#                 'user_id': userName,
-#                 'exp': int(time.time()) + 3600  # Token expires in 1 hour
-#             }
-            
-#             secret_key = settings.JWT_SECRET_KEY  # Ensure you have this setting
-#             jwt_token = jwt.encode(payload, secret_key, algorithm='HS256')
-
-#             # Return JSON response with the JWT token
-#             return JsonResponse({
-#                 'username': userName,
-#                 'jwtToken': jwt_token,
-#                 'message': 'Authentication successful'
-#             })
-#         else:
-#             return JsonResponse({'error': 'You haven\'t registered for SOC'}, status=401)
-#     except Exception as e:
-#         print(f'Error during GitHub callback: {e}')
-#         return JsonResponse({'error': 'An error occurred during authentication'}, status=500)
