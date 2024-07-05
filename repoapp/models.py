@@ -8,12 +8,12 @@ class PullRequest(models.Model):
     base_html_url = models.URLField(max_length=255)
     requesterName = models.CharField(max_length=100, blank=True)
     requestedTime = models.DateTimeField(auto_now_add=True)
-    total_pull_requests = models.PositiveIntegerField(default=0)
+    mergedTime = models.DateTimeField(auto_now_add=True)
     prStatus = models.CharField(max_length=50, null=True, blank=True)
     repoName = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return self.title
+        return self.title +' by '+self.requesterName
     
 class Repositories(models.Model):
     repoName = models.CharField(max_length=255,default='')
@@ -31,7 +31,7 @@ class RegisteredUser(models.Model):
     
 class Point(models.Model):
     userName =models.CharField(max_length=50,primary_key=True)
-    point = models.IntegerField(blank=True, null=True)
+    point = models.IntegerField(default=0)
     
     def __str__(self):
         return self.userName

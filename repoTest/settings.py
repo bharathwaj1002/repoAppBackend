@@ -62,6 +62,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+
 ROOT_URLCONF = 'repoTest.urls'
 
 TEMPLATES = [
@@ -91,8 +93,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'verceldb',
         'USER': 'default',
-        'PASSWORD': 'thY1CxELO4XW',
-        'HOST': 'ep-fancy-sunset-a406rc3r-pooler.us-east-1.aws.neon.tech',
+        'PASSWORD': '5ykrj9cnUdCB',
+        'HOST': 'ep-odd-surf-a432eitm-pooler.us-east-1.aws.neon.tech',
 	    'PORT': '5432'
     }
 }
@@ -214,6 +216,12 @@ JAZZMIN_UI_TWEAKS = {
 
 GITHUB_CLIENT_ID = 'Ov23liUaH6DXYpQeOviF'
 GITHUB_CLIENT_SECRET = '81fff3c9242f62632364d08188dd3fca61605b46'
-JWT_SECRET_KEY = 'ehviydefuy3t3764tytfusduy45434uhyudg362t467324gvcgvj783487t3784t37648724gyuwgduyusyudgusydgufueufg67'
+
+JWT_SECRET_KEY = 'f690a15c-d4d4-4ad1-adcb-7cbd3bb8d057-6e37fc3c-b873-4656-b421-04272e0e147b-9b81634f-0e6e-443d-84da-87f22d591f93'
+JWT_ACCESS_TOKEN_EXPIRATION = 123456789
+
+JWT_REFRESH_SECRET_KEY = 'bb605db2-fb0f-420f-8aa4-750f9ec86f63-8640c2d9-207c-437d-9bc9-df32074c1bba-36641d06-0450-414b-89dd-aa86758d1397'
+JWT_REFRESH_TOKEN_EXPIRATION = 123456789
+
 GOOGLE_CLIENT_ID = '361457186217-3k36h02qtvmobb4dh83nohauksv435ts.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET= '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',
+GOOGLE_CLIENT_SECRET= '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'
