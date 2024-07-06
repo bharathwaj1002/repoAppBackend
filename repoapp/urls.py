@@ -11,7 +11,7 @@ urlpatterns = [
 
 
     path('callback/', views.google_callback, name='google_callback'),
-    
-    path('callback/', views.github_callback, name='github_callback'),
+    path('callback', views.github_callback, name='github_callback'),
+    path('logout/', views.logout, name='logout'),
     
 ]

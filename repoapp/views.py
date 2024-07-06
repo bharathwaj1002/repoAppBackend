@@ -9,25 +9,51 @@ from .serializers import *
 import json
 import jwt
 import requests
-from asgiref.sync import async_to_sync
 from .models import PullRequest
 
 
 # Create your views here.
 def pull_requests_list(request):
-    pull_requests = PullRequest.objects.all()
-    serializer = PullRequestSerializer(pull_requests, many=True)
-    return JsonResponse(serializer.data, safe=False)
+    if request.COOKIES.get('email_token'):
+        email_token = request.COOKIES.get('email_token')
+        decoded_email_token = jwt.decode(email_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
+        userName = decoded_email_token['user_name']
+        if RegisteredUser.objects.filter(userName=userName):
+            pull_requests = PullRequest.objects.all()
+            serializer = PullRequestSerializer(pull_requests, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return JsonResponse({'error': 'You haven\'t registered for SOC'}, status=401)
+    else:
+        return JsonResponse({'error': 'Thambi Thambi! Inga laam vara koodathu pah'}, status=401)
 
 def repositories_list(request):
-    repositories = Repositories.objects.all()
-    serializer = RepositorySerializer(repositories, many=True)
-    return JsonResponse(serializer.data, safe=False)
+    if request.COOKIES.get('email_token'):
+        email_token = request.COOKIES.get('email_token')
+        decoded_email_token = jwt.decode(email_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
+        userName = decoded_email_token['user_name']
+        if RegisteredUser.objects.filter(userName=userName):
+            repositories = Repositories.objects.all()
+            serializer = RepositorySerializer(repositories, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return JsonResponse({'error': 'You haven\'t registered for SOC'}, status=401)
+    else:
+        return JsonResponse({'error': 'Thambi Thambi! Inga laam vara koodathu pah'}, status=401)
 
 def points_list(request):
-    point = Point.objects.all()
-    serializer = PointSerializer(point, many=True)
-    return JsonResponse(serializer.data, safe=False)
+    if request.COOKIES.get('email_token'):
+        email_token = request.COOKIES.get('email_token')
+        decoded_email_token = jwt.decode(email_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
+        userName = decoded_email_token['user_name']
+        if RegisteredUser.objects.filter(userName=userName):
+            point = Point.objects.all()
+            serializer = PointSerializer(point, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return JsonResponse({'error': 'You haven\'t registered for SOC'}, status=401)
+    else:
+        return JsonResponse({'error': 'Thambi Thambi! Inga laam vara koodathu pah'}, status=401)
 
 
 
@@ -35,18 +61,6 @@ def points_list(request):
 
 
 def verify_user(request):
-    # if request.COOKIES.get('email_token'):
-    #     email_token = request.COOKIES.get('email_token')
-        
-    # # Decode email token to get email
-    # email = decoded_email_token['email']
-    
-        # Check if email token is expired
-
-    # print("decoded_email_token")
-    # print(decoded_email_token)
-    
-    
     if not request.COOKIES.get('email_token'):
         refresh_token = request.COOKIES.get('refresh_token')
             
@@ -58,7 +72,7 @@ def verify_user(request):
             decoded_refresh_token = jwt.decode(refresh_token, settings.JWT_REFRESH_SECRET_KEY, algorithms=['HS256'])
             
             
-            if 'user_name' in decoded_refresh_token and 'email' in decoded_refresh_token:
+            if 'user_name' in decoded_refresh_token:
                 email = decoded_refresh_token['email']
                 userName = decoded_refresh_token['user_name']
                 payload = {
@@ -164,17 +178,12 @@ def github_webhook(request):
                     html_url=pr_html_url,
                     base_html_url=base_html_url,
                     requesterName=requester_name,
-                    # You can also set the requestedTime field manually if needed
                     requestedTime=timezone.now(),
                 )
                 existing_pull_request.prStatus = 'Pending'
                 print("UPDATED PENDING")
                 existing_pull_request.repoName = repo_data.get('name', '')
                 existing_pull_request.save()
-                
-                user = Point.objects.get(userName=requester_name)
-                user.point+=3
-                user.save()
                 
                 return JsonResponse({'status': 'created'})
 
@@ -187,15 +196,15 @@ def github_webhook(request):
                         'title': pr_title,
                         'html_url': pr_html_url,
                         'requesterName': requester_name,
-                        'requestedTime': timezone.now(),
+                        'requestedTime':timezone.now()
                     }
                 )
                 existing_pull_request.prStatus = 'Merged'
                 existing_pull_request.repoName = repo_data.get('name', '')
+                existing_pull_request.mergedTime = timezone.now()
                 existing_pull_request.save()
                 
                 user = Point.objects.get(userName=requester_name)
-                user.point-=3
                 user.point+=10
                 user.save()
                 
@@ -332,49 +341,6 @@ def github_callback(request):
         decoded_email_token = jwt.decode(email_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
         email = decoded_email_token['email']
         
-        # Check if email token is expired
-        if time.time() > decoded_email_token['exp']:
-            # Email token is expired, try to refresh using refresh token
-            refresh_token = request.COOKIES.get('refresh_token')
-            
-            if not refresh_token:
-                return JsonResponse({'error': 'Refresh token is missing'}, status=401)
-            
-            try:
-                # Decode refresh token to get email
-                decoded_refresh_token = jwt.decode(refresh_token, settings.JWT_REFRESH_SECRET_KEY, algorithms=['HS256'])
-                refreshed_email = decoded_refresh_token['email']
-                
-                # Ensure the email from refresh token matches the email from email token
-                if refreshed_email != email:
-                    return JsonResponse({'error': 'Email mismatch between tokens'}, status=401)
-                
-                # Generate a new email token with extended expiration
-                payload = {
-                    'email': refreshed_email,
-                    'exp': time.time()+settings.JWT_ACCESS_TOKEN_EXPIRATION
-                }
-                
-                new_email_token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm='HS256')
-                
-                # Update email token in cookies
-                response = JsonResponse({'message': 'Email token refreshed successfully'})
-                response.set_cookie(
-                    'email_token',
-                    new_email_token,
-                    max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION,
-                    httponly=True,
-                    secure=False,
-                    samesite=None
-                )
-                
-                # Continue with the refreshed email token
-                email_token = new_email_token
-            
-            except jwt.ExpiredSignatureError:
-                return JsonResponse({'error': 'Refresh token has expired'}, status=401)
-            except jwt.InvalidTokenError:
-                return JsonResponse({'error': 'Invalid refresh token'}, status=401)
         
         # Proceed with GitHub authentication
         if RegisteredUser.objects.filter(email=email).exists():
@@ -413,8 +379,15 @@ def github_callback(request):
                 'exp': time.time()+settings.JWT_ACCESS_TOKEN_EXPIRATION
             }
             
+            refresh_payload = {
+                'email': email,
+                'user_name': userName,
+                'exp': time.time()+settings.JWT_REFRESH_TOKEN_EXPIRATION
+            }
+            
             # Generate access token
             email_token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm='HS256')
+            refresh_token = jwt.encode(refresh_payload, settings.JWT_SECRET_KEY, algorithm='HS256')
             
             # Set cookies for access token
             response = JsonResponse({'user_name': userName})
@@ -426,6 +399,15 @@ def github_callback(request):
                 secure=False,
                 samesite=None
             )
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION,
+                httponly=True,
+                secure=False,
+                samesite=None
+            )
+            
             
             return response
         
@@ -435,3 +417,20 @@ def github_callback(request):
     except Exception as e:
         print(f'Error during GitHub callback: {e}')
         return JsonResponse({'error': 'An error occurred during authentication'}, status=500)
+    
+def logout(request):
+    request.COOKIES.get('email_token')
+    response = JsonResponse({'success': 'Logout Successfull'})
+    response.set_cookie(
+        'email_token',
+        None,
+        max_age=-1,
+        httponly=True
+    )
+    response.set_cookie(
+        'refresh_token',
+        None,
+        max_age=-1,
+        httponly=True
+    )
+    return response
