@@ -90,7 +90,7 @@ def verify_user(request):
                 new_email_token,
                 max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION,
                 httponly=True,
-                secure=False,
+                secure=True,
                 samesite=None
                 )
                 
@@ -115,7 +115,7 @@ def verify_user(request):
                 new_email_token,
                 max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION,
                 httponly=True,
-                secure=False,
+                secure=True,
                 samesite=None
                 )
                 
@@ -255,7 +255,7 @@ def google_callback(request):
                 email_token,
                 max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION,
                 httponly=True,
-                secure=False,
+                secure=True,
                 samesite=None
             )
             
@@ -265,7 +265,7 @@ def google_callback(request):
                     refresh_token,
                     max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION,
                     httponly=True,
-                    secure=False,
+                    secure=True,
                     samesite=None
                 )
             
@@ -299,7 +299,7 @@ def google_callback(request):
                 email_token,
                 max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION,
                 httponly=True,
-                secure=False,
+                secure=True,
                 samesite=None
             )
             
@@ -309,7 +309,7 @@ def google_callback(request):
                     refresh_token,
                     httponly=True,
                     max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION,
-                    secure=False,
+                    secure=True,
                     samesite=None
                 )
             # print(request.COOKIES.get('email_token'))
@@ -396,7 +396,7 @@ def github_callback(request):
                 email_token,
                 max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION,
                 httponly=True,
-                secure=False,
+                secure=True,
                 samesite=None
             )
             response.set_cookie(
@@ -404,7 +404,7 @@ def github_callback(request):
                 refresh_token,
                 max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION,
                 httponly=True,
-                secure=False,
+                secure=True,
                 samesite=None
             )
             
