@@ -425,12 +425,16 @@ def logout(request):
         'email_token',
         None,
         max_age=-1,
-        httponly=True
+        httponly=True,
+        secure=True,
+        samesite='None'
     )
     response.set_cookie(
         'refresh_token',
         None,
         max_age=-1,
-        httponly=True
+        httponly=True,
+        secure=True,
+        samesite='None'
     )
     return response
