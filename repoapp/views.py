@@ -41,6 +41,7 @@ def repositories_list(request):
     else:
         return JsonResponse({'error': 'Thambi Thambi! Inga laam vara koodathu pah'}, status=401)
 
+
 def points_list(request):
     if request.COOKIES.get('email_token'):
         email_token = request.COOKIES.get('email_token')
@@ -99,8 +100,6 @@ def verify_user(request):
             elif 'email' in decoded_refresh_token:
                 email = decoded_refresh_token['email']
                 
-                
-            # Generate a new email token with extended expiration
                 payload = {
                 'email': email,
                 'exp': time.time()+settings.JWT_ACCESS_TOKEN_EXPIRATION
@@ -108,7 +107,6 @@ def verify_user(request):
                 
                 new_email_token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm='HS256')
             
-                # Update email token in cookies
                 response = JsonResponse({'email': email})
                 response.set_cookie(
                 'email_token',
@@ -118,7 +116,6 @@ def verify_user(request):
                 secure=True,
                 samesite='None'
                 )
-                
                 return response
             else:
                 return JsonResponse({'error': 'Token not found'}, status=401)
